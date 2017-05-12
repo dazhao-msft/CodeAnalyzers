@@ -1,8 +1,4 @@
-﻿//-----------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-//-----------------------------------------------------------------------------
-
-namespace CodeAnalyzers
+﻿namespace CodeAnalyzers
 {
     internal static class DiagnosticCategory
     {

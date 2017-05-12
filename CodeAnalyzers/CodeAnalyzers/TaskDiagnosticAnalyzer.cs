@@ -1,8 +1,4 @@
-﻿//-----------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-//-----------------------------------------------------------------------------
-
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -12,6 +8,8 @@ namespace CodeAnalyzers
 {
     internal abstract class TaskDiagnosticAnalyzer : DiagnosticAnalyzer
     {
+        protected abstract TaskMemberToDiagnose TaskMemberToDiagnose { get; }
+
         public override void Initialize(AnalysisContext analysisContext)
         {
             analysisContext.RegisterCompilationStartAction(compilationStartAnalysisContext =>
@@ -43,18 +41,16 @@ namespace CodeAnalyzers
                             return;
                         }
 
-                        var taskApiToDiagnose = GetTaskApiToDiagnose();
-
                         var identifierNameNode = (IdentifierNameSyntax)syntaxNodeAnalysisContext.Node;
 
-                        if (identifierNameNode.Identifier.Text != taskApiToDiagnose.Name)
+                        if (identifierNameNode.Identifier.Text != TaskMemberToDiagnose.Name)
                         {
                             return;
                         }
 
                         var symbolInfo = syntaxNodeAnalysisContext.SemanticModel.GetSymbolInfo(identifierNameNode, syntaxNodeAnalysisContext.CancellationToken);
 
-                        if (symbolInfo.Symbol == null || symbolInfo.Symbol.Kind != taskApiToDiagnose.SymbolKind)
+                        if (symbolInfo.Symbol == null || symbolInfo.Symbol.Kind != TaskMemberToDiagnose.SymbolKind)
                         {
                             return;
                         }
@@ -70,15 +66,6 @@ namespace CodeAnalyzers
                     }, SyntaxKind.IdentifierName);
                 });
             });
-        }
-
-        protected abstract TaskApiToDiagnose GetTaskApiToDiagnose();
-
-        protected struct TaskApiToDiagnose
-        {
-            public string Name { get; set; }
-
-            public SymbolKind SymbolKind { get; set; }
         }
     }
 }
